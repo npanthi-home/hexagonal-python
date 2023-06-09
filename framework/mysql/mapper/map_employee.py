@@ -1,17 +1,18 @@
-from sqlalchemy.orm import mapper, relationship
-from entity.Department import Department
+from sqlalchemy import Table, Column, Integer, String, ForeignKey
+from sqlalchemy.orm import registry
 from entity.Employee import Employee
-from framework.mysql.mapper.Base import Base
 
 def map_employee():
-    mapper(
-        Employee,
-        Base.metadata.tables['employee'],
-        properties={
-            'id': Base.metadata.tables['employee'].c.id,
-            'name': Base.metadata.tables['employee'].c.name,
-            'age': Base.metadata.tables['employee'].c.age,
-            'department': relationship(Department),
-            'salary': Base.metadata.tables['employee'].c.salary,
-        }
+    mapper_registry = registry()
+
+    employee_table = Table(
+        "employee",
+         mapper_registry.metadata,
+        Column('id', Integer, primary_key=True),
+        Column('name', String(50)),
+        Column('age', Integer),
+        Column('department_id', Integer, ForeignKey('department.id')),
+        Column('salary', Integer),
     )
+
+    mapper_registry.map_imperatively(Employee, employee_table)

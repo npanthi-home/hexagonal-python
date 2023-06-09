@@ -1,14 +1,16 @@
-from sqlalchemy.orm import mapper
+from sqlalchemy import Table, Column, Integer, String
+from sqlalchemy.orm import registry
 from entity.Department import Department
-from framework.mysql.mapper.Base import Base
 
 def map_department():
-    mapper(
-        Department,
-        Base.metadata.tables['department'],
-        properties={
-            'id': Base.metadata.tables['department'].c.id,
-            'name': Base.metadata.tables['department'].c.name,
-            'employee_count': Base.metadata.tables['department'].c.employee_count,
-        }
+    mapper_registry = registry()
+
+    department_table = Table(
+        "department",
+        mapper_registry.metadata,
+        Column('id', Integer, primary_key=True),
+        Column('name', String(50)),
+        Column('employee_count', Integer),
     )
+
+    mapper_registry.map_imperatively(Department, department_table)
